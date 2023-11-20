@@ -1,11 +1,12 @@
 bookdown::bs4_book:
-  css: style.css
+  css: bs4_style.css
   theme:
     primary: "#096872"
+  repo: https://github.com/anoobvinu07/Genomic_assisted_selection
   config:
     toc:
       before: |
-        <li><a href="./">A Minimal Book Example</a></li>
+        <li><a href="./">Bringing genomics to the field: an integrative approach to forest restoration</a></li>
       after: |
         <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
     edit: https://github.com/USERNAME/REPO/edit/BRANCH/%s

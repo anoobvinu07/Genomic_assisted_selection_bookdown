@@ -1,0 +1,100 @@
+# Funtions to optimize selection {-} 
+
+## Select regions to select sources   {-} 
+Based on the idea of ***Regional admixture provenancing*** (citation), seed sources were selected regionally for each restoration site. Three groups of source populations were subsetted for the three planting sites, removing XVC and HR because of their northern ancestry. More info on the regional ancestry detailed in (citation).  
+```{r eval=FALSE}
+# Sources considered for the Maryland restoration site 
+TAB_pop_maryland <- TAB_pop[which(names(TAB_pop)%in%info_pops$Site[which(info_pops$Region=="E" & !info_pops$State%in%c("NC","TN") & !info_pops$Site%in%c("XCV","HR"))])]
+
+# Sources considered for the West Virginia restoration site
+TAB_pop_westvirginia <- TAB_pop[which(names(TAB_pop)%in%info_pops$Site[which(info_pops$Region=="E" & info_pops$State=="WV" & !info_pops$Site%in%c("XCV","HR"))])]
+
+# Sources considered for the Virginia restoration site
+TAB_pop_virginia <- TAB_pop[which(names(TAB_pop)%in%info_pops$Site[which(info_pops$Region=="E" & (info_pops$State=="WV" & !info_pops$Site%in%c("XCV") | info_pops$Site%in%c("GMF","CR","DG","RP")))])] # remove HR and CV for the paper
+```
+
+## Optimizing genetic diversity  {-} 
+```{r eval=FALSE}
+# function to estimate allelic richness after rarefaction
+rarefy_AR <- function(data, g, bootstraping=100){
+  Nijg <- list()
+  Njg <- g*2
+  nbind <- ncol(data)
+  Nij <- list()
+  for(boot in 1:bootstraping){
+    inds <- sample(1:nbind, g, replace = FALSE)
+    if(g==1){
+      Nij[[boot]] <- data[,inds]*2}
+    if(g>1){
+      Nij[[boot]] <- apply(data[,inds], 1, function(x) sum(x, na.rm = T)/sum(!is.na(x)))*g*2}
+  }
+  Nijg <- rowMeans(do.call(cbind, Nij), na.rm = T)
+  Qijg <- (Njg-Nijg)/Njg
+  Pijg <- 1-Qijg
+  return(Pijg)
+}
+```
+
+## Estimate the genetic load   {-} 
+The following function is used to estiamte the ratio of nonsynonymous/synonymous mutation based on the annotation from [SnpEff v5.1](https://pcingola.github.io/SnpEff/) *(Cingolani et al., 2012)*, which was used to annotate genetic variants to functional class based on Norway spruce genome annotation. The functional categories *viz.* `missense variant, splice acceptor variant, splice donor variant, splice region variant, start lost, stop gained, stop lost` were used to designate as non-synonymous mutation in our calculation for genetic load.
+```{r eval=FALSE}
+genetic_load <- function(data, category){
+  nonsyn_sites <- which(category=="missense_variant" | category=="splice_acceptor_variant" | category=="splice_donor_variant" | category=="splice_region_variant" | category=="start_lost" | category=="stop_gained" | category=="stop_lost")
+  freq_nonsyn <- mean(data[nonsyn_sites], na.rm = T)
+  freq_syn <- mean(data[-nonsyn_sites], na.rm = T)
+  ratio_2 <- freq_nonsyn/freq_syn
+  return(ratio_2)
+}
+```
+
+## Combined function to optimize source combinations  {-}  
+This function combines the rarefy_AR and genetic_load function to estimate expected heterozygosity (Hexp), allelic richness and genetic load in all combinations of ***P*** populations. The ***P*** depends on the number of sources one decides to select for their restoration site. 
+```{r eval=FALSE}
+# function to estimate Hexp, Allelic Richness and Genetic Load in all combination of P populations
+optimize <- function(data, P){
+  
+  # Total diversity and load with all the populations
+  TAB_tot <- do.call(cbind,data)
+  freq_tot <- apply(TAB_tot, 1, function(y) sum(y, na.rm = T)/sum(!is.na(y)))
+  hexp_tot <- mean(2*freq_tot*(1-freq_tot), na.rm = T)
+  #all_rich_tot <- mean(rarefy_AR(TAB_tot, ncol(TAB_tot)), na.rm = T)
+  genetic_load_tot <- genetic_load(TAB_tot, category)
+  
+  # Genetic diversity and load with only a subset of P populations
+  hexp_sub <- list()
+ 
+  genetic_load_sub <- list()
+  names <- list()
+  comb <- combn(1:length(data), P, simplify = F)
+  for(i in 1:length(comb)){
+    TAB_sub <- do.call(cbind, data[comb[[i]]])
+    freq_sub <- apply(TAB_sub, 1, function(y) sum(y, na.rm = T)/sum(!is.na(y)))
+    hexp_sub[i] <- mean(2*freq_sub*(1-freq_sub), na.rm = T)
+    
+    genetic_load_sub[i] <- genetic_load(TAB_sub, category)
+    names[i] <- paste(names(data[comb[[i]]]), collapse="_")
+  }
+  TAB_sub <- do.call(rbind, lapply(1:length(hexp_sub), function(x) c(Hexp = hexp_sub[[x]], GenLoad = genetic_load_sub[[x]]))) #AllRich = all_rich_sub[[x]], 
+  TAB <- rbind(c(Hexp = hexp_tot, GenLoad = genetic_load_tot), TAB_sub) #AllRich = all_rich_tot, 
+  rownames(TAB) <- c("total", unlist(names))
+  
+  return(TAB)
+}
+```
+
+## Apply the function to get optimal source combinations {-} 
+```{r eval=FALSE}
+# Optimization sources for site in Maryland
+res_maryland <- optimize(TAB_pop_maryland, 3)
+which.max(res_maryland[-1,1]/res_maryland[-1,2])
+res_maryland[c(1,which.max(res_maryland[-1,1]/res_maryland[-1,2])+1),]
+
+# Optimization sources for site in West Virginia
+res_westvirginia_4 <- optimize(TAB_pop_westvirginia, 4)
+which.max(res_westvirginia_4[-1,1]/res_westvirginia_4[-1,2])
+
+# Optimization sources for site in Virginia
+res_virginia_4 <- optimize(TAB_pop_virginia, 4)
+which.max(res_virginia_4[-1,1]/res_virginia_4[-1,2])
+
+```

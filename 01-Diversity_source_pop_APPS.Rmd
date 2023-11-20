@@ -1,0 +1,540 @@
+# (PART\*) Genomic selection of sources  
+# Selecting the source populations to optimize genetic diversity in Edge population {-} 
+
+Read in the necessary data for the source optimization. 
+```{r eval=FALSE}
+## working directory 
+setwd("~/mydata/Anoob/TNC")
+
+list <- list.files(path = "../../datashare/Spruce/exome_capture/WES_mapping/Annotations/ref_Pglauca/VCF_split_files", 
+                   pattern = "Red_Spruce_intersect_poly_", recursive=TRUE, full.names = T)
+
+genes <- lapply(list[1], function(x) read.table(x))
+category <- lapply(genes, function(x) unlist(lapply(strsplit(as.character(x[,8]), split = "|", fixed = T), function(y) y[2])))
+
+TAB <- genes[1:2]
+TAB <- do.call(rbind, TAB)
+category <- do.call(c, category)
+```
+
+
+```{r eval=FALSE}
+# Info samples
+names <- unlist(lapply(strsplit(unlist(strsplit(as.character(read.table("all_bam.list")[,1]), split = "_rmdup.sorted.bam")), split = "./"), function(x) x[2]))
+pops <- unlist(lapply(strsplit(names, split="_"), function(x) x[1]))
+
+info_inds <- read.table("./Info_samples_revised.txt", header=T)
+info_inds <- info_inds[match(as.character(names), as.character(info_inds$Family)),]
+info_pops <- info_inds[!duplicated(info_inds$Site),-c(1,3,9,10)]
+
+##################################################
+#### NA, allele probabilities and frequencies ####
+
+# Read depth 
+## Commented out thibauts original code and editing in the following line
+# depth <- apply(TAB[,-c(1:9)], 2, function(x) as.integer(unlist(lapply(strsplit(as.character(x), split = ":"), function(y) y[1]))))
+depth <- apply(TAB[,-c(1:9)], 2, function(x) as.integer(unlist(lapply(strsplit(as.character(x), split = ":"), function(y) y[2]))))
+
+# Genotype probabilities, changed by NA for the uncovered sites 
+# gen_prob <- apply(TAB[,-c(1:9)], 2, function(x) unlist(lapply(strsplit(as.character(x), split = ":"), function(y) y[3])))
+gen_prob <- apply(TAB[,-c(1:9)], 2, function(x) unlist(lapply(strsplit(as.character(x), split = ":"), function(y) y[4])))
+gen_prob[which(depth==0)] <- NA
+
+# Proba alternative allele
+altern_proba <- apply(gen_prob, 2, function(x) (as.numeric(unlist(lapply(strsplit(as.character(x), split = ","), function(y) y[2])))+2*as.numeric(unlist(lapply(strsplit(as.character(x), split = ","), function(z) z[3]))))/2)
+
+# Frequency of the alternative allele for each locus and population
+TAB_pop <- lapply(unique(pops), function(x) altern_proba[,which(pops==x)])
+names(TAB_pop) <- unique(pops)
+freq_pop <- lapply(TAB_pop, function(x) apply(x, 1, function(y) sum(y, na.rm = T)/sum(!is.na(y))))
+
+
+#############################################
+#### Optimizing genetic diversity / load ####
+
+# Three groups of source populations for the three planting sites, removing XVC and HR because of their northern ancestry
+TAB_pop_maryland <- TAB_pop[which(names(TAB_pop)%in%info_pops$Site[which(info_pops$Region=="E" & !info_pops$State%in%c("NC","TN") & !info_pops$Site%in%c("XCV","HR"))])]
+TAB_pop_westvirginia <- TAB_pop[which(names(TAB_pop)%in%info_pops$Site[which(info_pops$Region=="E" & info_pops$State=="WV" & !info_pops$Site%in%c("XCV","HR"))])]
+# TAB_pop_virginia <- TAB_pop[which(names(TAB_pop)%in%info_pops$Site[which(info_pops$Region=="E" & (info_pops$State=="WV" | info_pops$Site%in%c("GMF","CR","DG","RP","HR")))])] # remove HR and CV for the paper
+
+TAB_pop_virginia <- TAB_pop[which(names(TAB_pop)%in%info_pops$Site[which(info_pops$Region=="E" & (info_pops$State=="WV" & !info_pops$Site%in%c("XCV") | info_pops$Site%in%c("GMF","CR","DG","RP")))])] # remove HR and CV for the paper
+
+# function to estimate allelic richness after rarefaction
+rarefy_AR <- function(data, g, bootstraping=100){
+  Nijg <- list()
+  Njg <- g*2
+  nbind <- ncol(data)
+  Nij <- list()
+  for(boot in 1:bootstraping){
+    inds <- sample(1:nbind, g, replace = FALSE)
+    if(g==1){
+      Nij[[boot]] <- data[,inds]*2}
+    if(g>1){
+      Nij[[boot]] <- apply(data[,inds], 1, function(x) sum(x, na.rm = T)/sum(!is.na(x)))*g*2}
+  }
+  Nijg <- rowMeans(do.call(cbind, Nij), na.rm = T)
+  Qijg <- (Njg-Nijg)/Njg
+  Pijg <- 1-Qijg
+  return(Pijg)
+}
+
+# function to estimate the ratio of nonsynonymous/synonymous mutation
+genetic_load <- function(data, category){
+  nonsyn_sites <- which(category=="missense_variant" | category=="splice_acceptor_variant" | category=="splice_donor_variant" | category=="splice_region_variant" | category=="start_lost" | category=="start_retained_variant" | category=="stop_gained" | category=="stop_lost" | category=="stop_retained_variant")
+  freq_nonsyn <- mean(data[nonsyn_sites], na.rm = T)
+  freq_syn <- mean(data[-nonsyn_sites], na.rm = T)
+  ratio_2 <- freq_nonsyn/freq_syn
+  return(ratio_2)
+} # remove start_retained_variant & stop_retained_variant for paper
+
+genetic_load2 <- function(data, category){
+  nonsyn_sites <- which(category=="missense_variant" | category=="splice_acceptor_variant" | category=="splice_donor_variant" | category=="splice_region_variant" | category=="start_lost" | category=="stop_gained" | category=="stop_lost")
+  freq_nonsyn <- mean(data[nonsyn_sites], na.rm = T)
+  freq_syn <- mean(data[-nonsyn_sites], na.rm = T)
+  ratio_2 <- freq_nonsyn/freq_syn
+  return(ratio_2)
+} 
+
+genetic_load3 <- function(data, category){
+  nonsyn_sites <- which(category=="missense_variant" | category=="splice_acceptor_variant" | category=="splice_donor_variant" | category=="splice_region_variant" | category=="start_lost" | category=="stop_gained" | category=="stop_lost")
+  freq_nonsyn <- mean(data[nonsyn_sites], na.rm = T)
+  n_nonsyn <- dim(data[nonsyn_sites],na.rm=T)[1]
+  freq_syn <- mean(data[-nonsyn_sites], na.rm = T)
+  n_syn <- dim(data[-nonsyn_sites],na.rm=T)[1]
+  ratio_2 <- (freq_nonsyn*n_nonsyn)/(freq_syn*n_syn)
+  return(ratio_2)
+} 
+
+## TESTING ###################################################################################
+temp_dump <- genetic_load(TAB_pop_maryland, category)
+
+TAB_tot <- do.call(cbind,TAB_pop_maryland)
+freq_tot <- apply(TAB_tot, 1, function(y) sum(y, na.rm = T)/sum(!is.na(y)))
+hexp_tot <- mean(2*freq_tot*(1-freq_tot), na.rm = T)
+#all_rich_tot <- mean(rarefy_AR(TAB_tot, ncol(TAB_tot)), na.rm = T)
+genetic_load_tot <- genetic_load2(TAB_tot, category)
+
+# Genetic diversity and load with only a subset of P populations
+hexp_sub <- list()
+#all_rich_sub <- list()
+genetic_load_sub <- list()
+names <- list()
+comb <- combn(1:length(data), P, simplify = F)
+for(i in 1:length(comb)){
+  TAB_sub <- do.call(cbind, data[comb[[i]]])
+  freq_sub <- apply(TAB_sub, 1, function(y) sum(y, na.rm = T)/sum(!is.na(y)))
+  hexp_sub[i] <- mean(2*freq_sub*(1-freq_sub), na.rm = T)
+  #all_rich_sub[i] <- mean(rarefy_AR(TAB_sub, ncol(TAB_sub)), na.rm = T)
+  genetic_load_sub[i] <- genetic_load(TAB_sub, category)
+  names[i] <- paste(names(data[comb[[i]]]), collapse="_")
+}
+TAB_sub <- do.call(rbind, lapply(1:length(hexp_sub), function(x) c(Hexp = hexp_sub[[x]], GenLoad = genetic_load_sub[[x]]))) #AllRich = all_rich_sub[[x]], 
+TAB <- rbind(c(Hexp = hexp_tot, GenLoad = genetic_load_tot), TAB_sub) #AllRich = all_rich_tot, 
+rownames(TAB) <- c("total", unlist(names))
+
+# sum() or length()
+length(!is.na(TAB_tot[which(category=="missense_variant" | category=="splice_acceptor_variant" | category=="splice_donor_variant" | category=="splice_region_variant" | category=="start_lost" | category=="start_retained_variant" | category=="stop_gained" | category=="stop_lost" | category=="stop_retained_variant")]))
+
+sum(!is.na(TAB_tot[which(category=="missense_variant" | category=="splice_acceptor_variant" | category=="splice_donor_variant" | category=="splice_region_variant" | category=="start_lost" | category=="start_retained_variant" | category=="stop_gained" | category=="stop_lost" | category=="stop_retained_variant")]))
+
+# working genetic load 3
+genetic_load3 <- function(data, category){
+  nonsyn_sites <- which(category=="missense_variant" | category=="splice_acceptor_variant" | category=="splice_donor_variant" | category=="splice_region_variant" | category=="start_lost" | category=="stop_gained" | category=="stop_lost")
+  freq_nonsyn <- mean(data[nonsyn_sites], na.rm = T)
+  n_nonsyn <- length(!is.na(data[nonsyn_sites]))
+  freq_syn <- mean(data[-nonsyn_sites], na.rm = T)
+  n_syn <- length(!is.na(data[-nonsyn_sites]))
+  ratio_2 <- (freq_nonsyn*n_nonsyn)/(freq_syn*n_syn)
+  return(c(ratio_2,freq_nonsyn,n_nonsyn,freq_syn,n_syn))
+} 
+
+genetic_load3 <- function(data, category){
+  nonsyn_sites <- which(category=="missense_variant" | category=="splice_acceptor_variant" | category=="splice_donor_variant" | category=="splice_region_variant" | category=="start_lost" | category=="stop_gained" | category=="stop_lost")
+  freq_nonsyn <- mean(data[nonsyn_sites], na.rm = T)
+  n_nonsyn <- length(!is.na(data[nonsyn_sites]))
+  freq_syn <- mean(data[-nonsyn_sites], na.rm = T)
+  n_syn <- length(!is.na(data[-nonsyn_sites]))
+  ratio_2 <- (freq_nonsyn*n_nonsyn)/(freq_syn*n_syn)
+  return(ratio_2)
+}
+
+gl_df <- genetic_load3(TAB_pop_maryland,category)
+
+genetic_load <- function(data, category){
+  nonsyn_sites <- which(category=="missense_variant" | category=="splice_acceptor_variant" | category=="splice_donor_variant" | category=="splice_region_variant" | category=="start_lost" | category=="start_retained_variant" | category=="stop_gained" | category=="stop_lost" | category=="stop_retained_variant")
+  freq_nonsyn <- mean(data[nonsyn_sites], na.rm = T)
+  freq_syn <- mean(data[-nonsyn_sites], na.rm = T)
+  ratio_2 <- freq_nonsyn/freq_syn
+  return(ratio_2)
+}
+
+gl_thib <- genetic_load(TAB_pop_maryland, category)
+
+## END TESTING ###################################################################################
+
+
+
+
+# function to estimate Hexp, Allelic Richness and Genetic Load in all combination of P populations
+optimize <- function(data, P){
+  
+  # Total diversity and load with all the populations
+  TAB_tot <- do.call(cbind,data)
+  freq_tot <- apply(TAB_tot, 1, function(y) sum(y, na.rm = T)/sum(!is.na(y)))
+  hexp_tot <- mean(2*freq_tot*(1-freq_tot), na.rm = T)
+  #all_rich_tot <- mean(rarefy_AR(TAB_tot, ncol(TAB_tot)), na.rm = T)
+  genetic_load_tot <- genetic_load2(TAB_tot, category)
+  
+  # Genetic diversity and load with only a subset of P populations
+  hexp_sub <- list()
+  #all_rich_sub <- list()
+  genetic_load_sub <- list()
+  names <- list()
+  comb <- combn(1:length(data), P, simplify = F)
+  for(i in 1:length(comb)){
+    TAB_sub <- do.call(cbind, data[comb[[i]]])
+    freq_sub <- apply(TAB_sub, 1, function(y) sum(y, na.rm = T)/sum(!is.na(y)))
+    hexp_sub[i] <- mean(2*freq_sub*(1-freq_sub), na.rm = T)
+    #all_rich_sub[i] <- mean(rarefy_AR(TAB_sub, ncol(TAB_sub)), na.rm = T)
+    genetic_load_sub[i] <- genetic_load2(TAB_sub, category)
+    names[i] <- paste(names(data[comb[[i]]]), collapse="_")
+  }
+  TAB_sub <- do.call(rbind, lapply(1:length(hexp_sub), function(x) c(Hexp = hexp_sub[[x]], GenLoad = genetic_load_sub[[x]]))) #AllRich = all_rich_sub[[x]], 
+  TAB <- rbind(c(Hexp = hexp_tot, GenLoad = genetic_load_tot), TAB_sub) #AllRich = all_rich_tot, 
+  rownames(TAB) <- c("total", unlist(names))
+  
+  return(TAB)
+}
+
+
+
+
+
+# Optimization sources for site in Maryland
+res_maryland <- optimize(TAB_pop_maryland, 3)
+which.max(res_maryland[-1,1]/res_maryland[-1,2])
+res_maryland[c(1,which.max(res_maryland[-1,1]/res_maryland[-1,2])+1),]
+
+# Optimization sources for site in West Virginia
+res_westvirginia <- optimize(TAB_pop_westvirginia, 3)
+which.max(res_westvirginia[-1,1]/res_westvirginia[-1,2])
+res_westvirginia[c(1,which.max(res_westvirginia[-1,1]/res_westvirginia[-1,2])+1),]
+
+# Optimization sources for site in Virginia
+res_virginia <- optimize(TAB_pop_virginia, 3)
+which.max(res_virginia[-1,1]/res_virginia[-1,2])
+res_virginia[c(1,which.max(res_virginia[-1,1]/res_virginia[-1,2])+1),]
+
+
+res_maryland_4 <- optimize(TAB_pop_maryland, P=4)
+which.max(res_maryland_4[-1,1]/res_maryland_4[-1,2])
+
+# 4 pop comb
+res_westvirginia_4 <- optimize(TAB_pop_westvirginia, 4)
+which.max(res_westvirginia_4[-1,1]/res_westvirginia_4[-1,2])
+
+res_virginia_4 <- optimize(TAB_pop_virginia, 4)
+which.max(res_virginia_4[-1,1]/res_virginia_4[-1,2])
+
+library(stringr)
+va_subset <- res_virginia_4[!str_detect(row.names(res_virginia_4),pattern="XCV"),]
+which.max(va_subset[-1,1]/va_subset[-1,2])
+va_subset["PRK_RP_XDS_XPK",]
+va_subset["HR_KOS_XPK_XSK",]
+
+# plots
+
+## MD
+hist(res_maryland[,1])
+res_maryland["XCS_XDS_XPK",1] #0.1738237
+abline(v=0.1738237)
+
+hist(res_maryland[,1]/res_maryland[,2])
+tail(sort(res_maryland[-1,1]/res_maryland[-1,2]),50)
+res_maryland["XCS_XDS_XPK",1]/res_maryland["XCS_XDS_XPK",2] # 0.1810744
+abline(v=0.1808131, col="red")
+
+## WV
+hist(res_westvirginia_4[,1]/res_westvirginia_4[,2])
+which.max(res_westvirginia_4[-1,1]/res_westvirginia_4[-1,2]) # the combination chosen for WV
+res_westvirginia_4["XCS_XDS_XPK_XSK",1]/res_westvirginia_4["XCS_XDS_XPK_XSK",2] 
+abline(v=0.1826622, col="red")
+
+
+## VA
+# remove XCV combs
+library(stringr)
+va_subset <- res_virginia_4[!str_detect(row.names(res_virginia_4),pattern="XCV"),]
+hist(res_virginia_4[-1,1]/res_virginia_4[-1,2])
+which.max(res_virginia_4[-1,1]/res_virginia_4[-1,2]) # not the combination chosen
+tail(sort(res_virginia_4[-1,1]/res_virginia_4[-1,2]),60)
+res_virginia_4["BFA_KOS_XDS_XPK",1]/res_virginia_4["BFA_KOS_XDS_XPK",2] # 0.1759985
+res_virginia_4["XCS_XDS_XPK_XSK",1]/res_virginia_4["XCS_XDS_XPK_XSK",2] # 0.1829254
+abline(v=0.1758529) # chosen combination
+abline(v=0.1826622, col="red") # highest in the subset
+quantile(res_virginia_4[-1,1]/res_virginia_4[-1,2], seq(.9,1,.005))
+# abline(v=0.1935974, col="blue")# highest for the XCV combination
+
+hist(res_virginia_4[-1,1]/res_virginia_4[-1,2])
+res_virginia_4["BFA_KOS_XDS_XPK",1]/res_virginia_4["BFA_KOS_XDS_XPK",2] # 0.1758529
+abline(v=0.1758529)
+
+# plotting end
+
+
+# Plots for APPS ----------------------------------------------------------
+require(ggplot2)
+# Maryland test
+hist(res_maryland[,1]/res_maryland[,2])
+tail(sort(res_maryland[-1,1]/res_maryland[-1,2]),50)
+res_maryland["XCS_XDS_XPK",1]/res_maryland["XCS_XDS_XPK",2] # 0.1810744
+abline(v=0.1808131, col="red")
+
+# Maryland final
+MD_data <- as.data.frame(res_maryland[,1]/res_maryland[,2])
+colnames(MD_data)[1] <- "GD_GL"
+MD_data$Sources <- rownames(MD_data)
+rownames(MD_data) <- NULL
+MD_data <- MD_data[-1,]
+
+MD_plot <-    ggplot(MD_data, aes(x=GD_GL)) +
+              geom_histogram(aes(y=..density..),color="#9FE2BF",fill="white", position="dodge", bins=60)+
+              geom_density(alpha=.2, fill="#9FE2BF", color="#DFFF00") +
+              geom_vline(aes(xintercept=res_maryland["XCS_XDS_XPK",1]/res_maryland["XCS_XDS_XPK",2]),
+                         linetype="dashed", color="#7B241C")+
+              theme(legend.position="top")
+
+plot1 <- MD_plot + scale_color_brewer(palette="Dark2") +
+          theme_minimal()+theme_classic()+theme(legend.position="top") +
+          ylab("Frequency") + xlab("Genetic Diversity/Genetic Load") + 
+          theme_bw(base_size = 11, base_family = "Times") +
+          theme(axis.text=element_text(size=14), 
+                axis.title=element_text(size=18),
+                panel.background = element_blank(), 
+                legend.background = element_blank(), 
+                panel.grid = element_blank(), 
+                plot.background = element_blank(), 
+                legend.text=element_text(size=rel(.8)), 
+                strip.text = element_text(size=30),
+                legend.position = "none")
+
+## WV test
+hist(res_westvirginia_4[,1]/res_westvirginia_4[,2],breaks = 60)
+which.max(res_westvirginia_4[-1,1]/res_westvirginia_4[-1,2]) # the combination chosen for WV
+res_westvirginia_4["XCS_XDS_XPK_XSK",1]/res_westvirginia_4["XCS_XDS_XPK_XSK",2] 
+abline(v=0.1826622, col="red")
+
+
+# West Virginia
+WV_data <- as.data.frame(res_westvirginia_4[,1]/res_westvirginia_4[,2])
+colnames(WV_data)[1] <- "GD_GL"
+WV_data$Sources <- rownames(WV_data)
+rownames(WV_data) <- NULL
+WV_data <- WV_data[-1,]
+
+WV_plot <-    ggplot(WV_data, aes(x=GD_GL)) +
+  geom_histogram(aes(y=..density..),color="#FF7F50",fill="white", position="dodge", bins=60)+
+  geom_density(alpha=.2, fill="#FF7F50", color="#FFBF00") +
+  geom_vline(aes(xintercept=res_westvirginia_4["XCS_XDS_XPK_XSK",1]/res_westvirginia_4["XCS_XDS_XPK_XSK",2]),
+             linetype="dashed", color="#7B241C")+
+  theme(legend.position="top")
+
+plot2 <- WV_plot + scale_color_brewer(palette="Dark2") +
+          theme_minimal()+theme_classic()+theme(legend.position="top") +
+          ylab("Frequency") + xlab("Genetic Diversity/Genetic Load") + 
+          theme_bw(base_size = 11, base_family = "Times") +
+          theme(axis.text=element_text(size=14), 
+                axis.title=element_text(size=18),
+                panel.background = element_blank(), 
+                legend.background = element_blank(), 
+                panel.grid = element_blank(), 
+                plot.background = element_blank(), 
+                legend.text=element_text(size=rel(.8)), 
+                strip.text = element_text(size=30),
+                legend.position = "none")
+
+# VA test
+hist(res_virginia_4[-1,1]/res_virginia_4[-1,2])
+res_virginia_4["BFA_KOS_XDS_XPK",1]/res_virginia_4["BFA_KOS_XDS_XPK",2] # 0.1758529
+abline(v=0.1758529)
+
+
+# Virginia
+VA_data <- as.data.frame(res_virginia_4[,1]/res_virginia_4[,2])
+colnames(VA_data)[1] <- "GD_GL"
+VA_data$Sources <- rownames(VA_data)
+rownames(VA_data) <- NULL
+VA_data <- VA_data[-1,]
+
+VA_plot <-    ggplot(VA_data, aes(x=GD_GL)) +
+  geom_histogram(aes(y=..density..),color="#CCCCFF",fill="white", position="dodge", bins=60)+
+  geom_density(alpha=.2, fill="#CCCCFF", color="#6495ED") +
+  geom_vline(aes(xintercept=res_virginia_4["BFA_KOS_XDS_XPK",1]/res_virginia_4["BFA_KOS_XDS_XPK",2]),
+             linetype="dashed", color="#7B241C")+
+  theme(legend.position="top")
+
+plot3 <- VA_plot + scale_color_brewer(palette="Dark2") +
+          theme_minimal()+theme_classic()+theme(legend.position="top") +
+          ylab("Frequency") + xlab("Genetic Diversity/Genetic Load") + 
+          theme_bw(base_size = 11, base_family = "Times") +
+          theme(axis.text=element_text(size=14), 
+                axis.title=element_text(size=18),
+                panel.background = element_blank(), 
+                legend.background = element_blank(), 
+                panel.grid = element_blank(), 
+                plot.background = element_blank(), 
+                legend.text=element_text(size=rel(.8)), 
+                strip.text = element_text(size=30),
+                legend.position = "none")
+
+# save data for further analysis
+MD_reg_GDGL <- as.data.frame(res_maryland)
+MD_reg_GDGL$GDGL <- MD_reg_GDGL$Hexp/MD_reg_GDGL$GenLoad
+
+WV_reg_GDGL <- as.data.frame(res_westvirginia_4)
+WV_reg_GDGL$GDGL <- WV_reg_GDGL$Hexp/WV_reg_GDGL$GenLoad
+
+VA_reg_GDGL <- as.data.frame(res_virginia_4)
+VA_reg_GDGL$GDGL <- VA_reg_GDGL$Hexp/VA_reg_GDGL$GenLoad
+
+GDGL_list <- list()
+GDGL_list[[1]] <- MD_reg_GDGL
+GDGL_list[[2]] <- WV_reg_GDGL
+GDGL_list[[3]] <- VA_reg_GDGL
+
+names(GDGL_list) <- c("Maryland_GDGL","West_Virginia_GDGL","Virginia_GDGL")
+
+# saveRDS(GDGL_list, "./OUTPUT/Genetic_diversity_and_Genetic_load/GDGL_list")
+
+
+# convert to long data
+MD_data2 <- MD_data
+MD_data2$Plot <- "Maryland"
+WV_data2 <- WV_data
+WV_data2$Plot <- "West Virginia"
+VA_data2 <- VA_data
+VA_data2$Plot <- "Virginia"
+
+
+GDGL_long_dat <- rbind(MD_data2,WV_data2,VA_data2)
+GDGL_long_dat$Plot <- factor(GDGL_long_dat$Plot,levels=c("Maryland","West Virginia","Virginia"))
+
+# final figure
+# figure dim: png(2000h,769w), pdf(7h,18w)
+GDGL_plot <- ggplot(GDGL_long_dat, aes(x=GD_GL,color=Plot,fill=Plot)) + facet_wrap(~Plot, scales="free") + 
+                # add histogram
+                geom_histogram(data=filter(GDGL_long_dat, Plot=="Maryland"), aes(y=..density..),color="#9FE2BF",fill="white", position="dodge", bins=60)+
+                geom_histogram(data=filter(GDGL_long_dat, Plot=="West Virginia"), aes(y=..density..),color="#FF7F50",fill="white", position="dodge", bins=60)+
+                geom_histogram(data=filter(GDGL_long_dat, Plot=="Virginia"), aes(y=..density..),color="#CCCCFF",fill="white", position="dodge", bins=60)+
+                
+                # add geom_density
+                geom_density(data=filter(GDGL_long_dat, Plot=="Maryland"), alpha=.2, fill="#9FE2BF", color="#40E0D0") + 
+                geom_density(data=filter(GDGL_long_dat, Plot=="West Virginia"), alpha=.2, fill="#FF7F50", color="#DE3163") + 
+                geom_density(data=filter(GDGL_long_dat, Plot=="Virginia"), alpha=.2, fill="#CCCCFF", color="#6495ED") +
+                
+                # add vline
+                geom_vline(data=filter(GDGL_long_dat, Plot=="Maryland"), 
+                           aes(xintercept=res_maryland["XCS_XDS_XPK",1]/res_maryland["XCS_XDS_XPK",2]),
+                           linetype="dashed", color="#7B241C") + 
+                geom_vline(data=filter(GDGL_long_dat, Plot=="West Virginia"), 
+                           aes(xintercept=res_westvirginia_4["XCS_XDS_XPK_XSK",1]/res_westvirginia_4["XCS_XDS_XPK_XSK",2]),
+                           linetype="dashed", color="#7B241C") + 
+                geom_vline(data=filter(GDGL_long_dat, Plot=="Virginia"), 
+                           aes(xintercept=res_virginia_4["BFA_KOS_XDS_XPK",1]/res_virginia_4["BFA_KOS_XDS_XPK",2]),
+                           linetype="dashed", color="#7B241C") +
+                # theme
+                theme_minimal()+theme_classic()+theme(legend.position="top") +
+                ylab("Frequency") + xlab("Genetic Diversity/Genetic Load") + 
+                theme_bw(base_size = 11, base_family = "Times") +
+                theme(axis.text=element_text(size=14), 
+                      axis.title=element_text(size=18),
+                      panel.background = element_blank(), 
+                      legend.background = element_blank(), 
+                      panel.grid = element_blank(), 
+                      plot.background = element_blank(), 
+                      legend.text=element_text(size=rel(.8)), 
+                      strip.text = element_text(size=30),
+                      legend.position = "none")
+
+GDGL_plot
+
+#--------------------------------------------------------------------------
+
+res_maryland_5 <- optimize(TAB_pop_maryland, 5)
+which.max(res_maryland_5[-1,1]/res_maryland_5[-1,2])
+res_westvirginia_5 <- optimize(TAB_pop_westvirginia, 5)
+which.max(res_westvirginia_5[-1,1]/res_westvirginia_5[-1,2])
+res_virginia_5 <- optimize(TAB_pop_virginia, 5)
+which.max(res_virginia_5[-1,1]/res_virginia_5[-1,2])
+
+
+rbind(res_maryland[c(1,which.max(res_maryland[-1,1]/res_maryland[-1,2])+1),], res_maryland_4[c(which.max(res_maryland_4[-1,1]/res_maryland_4[-1,2])+1),], res_maryland_5[which.max(res_maryland_5[-1,1]/res_maryland_5[-1,2])+1,])
+
+
+
+## Source selected - for Source_Selection_Maps.Rmd
+
+
+MarylandSources <- tail(sort(res_maryland[-1,1]/res_maryland[-1,2]),50)
+MarylandSources <- as.data.frame(MarylandSources)
+MarylandSources[2] <- rownames(MarylandSources)
+rownames(MarylandSources) <- NULL
+colnames(MarylandSources)[2] <- "Source_combination"
+colnames(MarylandSources)[1] <- "GD/GL"
+
+VirginiaSources <- tail(sort(res_virginia_4[-1,1]/res_virginia_4[-1,2]),50)
+VirginiaSources <- as.data.frame(VirginiaSources)
+VirginiaSources[2] <- rownames(VirginiaSources)
+rownames(VirginiaSources) <- NULL
+colnames(VirginiaSources)[2] <- "Source_combination"
+colnames(VirginiaSources)[1] <- "GD/GL"
+
+
+WestVirginiaSources <- tail(sort(res_westvirginia_4[-1,1]/res_westvirginia_4[-1,2]),50)
+WestVirginiaSources <- as.data.frame(WestVirginiaSources)
+WestVirginiaSources[2] <- rownames(WestVirginiaSources)
+rownames(WestVirginiaSources) <- NULL
+colnames(WestVirginiaSources)[2] <- "Source_combination"
+colnames(WestVirginiaSources)[1] <- "GD/GL"
+
+
+
+# write.csv(MarylandSources,"./OUTPUT/MarylandSources_selected_top50.csv")
+# write.csv(VirginiaSources,"./OUTPUT/VirginiaSources_selected_top50.csv")
+# write.csv(WestVirginiaSources,"./OUTPUT/WestVirginiaSources_selected_top50.csv")
+
+
+
+require(stringr)
+
+
+# Estimate genetic load and genetic diversity of each pops ----------------
+# Optimization sources for site in Maryland
+res_maryland_singular <- optimize(TAB_pop_maryland, 1)
+which.max(res_maryland_singular[-1,1]/res_maryland_singular[-1,2])
+res_maryland_singular[c(1,which.max(res_maryland_singular[-1,1]/res_maryland_singular[-1,2])+1),]
+
+# write.csv(res_maryland_singular, "./OUTPUT/Genetic_diversity_and_Genetic_load/maryland_GDGL_per_source")
+
+# Optimization sources for site in West Virginia
+res_westvirginia_singular <- optimize(TAB_pop_westvirginia, 1)
+which.max(res_westvirginia_singular[-1,1]/res_westvirginia_singular[-1,2])
+res_westvirginia_singular[c(1,which.max(res_westvirginia_singular[-1,1]/res_westvirginia_singular[-1,2])+1),]
+
+# write.csv(res_westvirginia_singular, "./OUTPUT/Genetic_diversity_and_Genetic_load/west_virginia_GDGL_per_source")
+
+# Optimization sources for site in Virginia
+res_virginia_singular <- optimize(TAB_pop_virginia, 1)
+which.max(res_virginia_singular[-1,1]/res_virginia_singular[-1,2])
+res_virginia_singular[c(1,which.max(res_virginia_singular[-1,1]/res_virginia_singular[-1,2])+1),]
+
+# write.csv(res_virginia_singular, "./OUTPUT/Genetic_diversity_and_Genetic_load/virginia_GDGL_per_source")
+
+# full sets of pops
+TAB_pop_full <- TAB_pop[which(names(TAB_pop)%in%info_pops$Site[which(info_pops$Region=="E" & !info_pops$Site%in%c("XCV","HR"))])]
+
+res_pop_full_singular <- optimize(TAB_pop_full, 1)
+which.max(res_pop_full_singular[-1,1]/res_pop_full_singular[-1,2])
+res_pop_full_singular[c(1,which.max(res_pop_full_singular[-1,1]/res_pop_full_singular[-1,2])+1),]
+```
+
