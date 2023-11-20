@@ -3,7 +3,7 @@
     "path": "Z:/Anoob/GitHub/Genomic_assisted_selection/_bookdown.yml",
     "project_path": "_bookdown.yml",
     "type": "yaml",
-    "hash": "0",
+    "hash": "651365887",
     "contents": "",
     "dirty": false,
     "created": 1700453342848.0,
@@ -11,14 +11,16 @@
     "relative_order": 3,
     "properties": {
         "source_window_id": "",
-        "Source": "Source"
+        "Source": "Source",
+        "cursorPosition": "6,13",
+        "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1700453314,
+    "lastKnownWriteTime": 1700498269,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1700453314,
+    "last_content_update": 1700498270250,
     "read_only": false,
     "read_only_alternatives": []
 }

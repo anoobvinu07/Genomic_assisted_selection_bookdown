@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 32 West Virginia | A Minimal Book Example</title>
+<meta name="author" content="John Doe">
+<meta name="description" content="WV_data &lt;- as.data.frame(res_westvirginia_4[,1]/res_westvirginia_4[,2]) colnames(WV_data)[1] &lt;- “GD_GL” WV_data$Sources &lt;- rownames(WV_data) rownames(WV_data) &lt;- NULL WV_data &lt;- WV_data[-1,]...">
+<meta name="generator" content="bookdown 0.36 with bs4_book()">
+<meta property="og:title" content="Chapter 32 West Virginia | A Minimal Book Example">
+<meta property="og:type" content="book">
+<meta property="og:description" content="WV_data &lt;- as.data.frame(res_westvirginia_4[,1]/res_westvirginia_4[,2]) colnames(WV_data)[1] &lt;- “GD_GL” WV_data$Sources &lt;- rownames(WV_data) rownames(WV_data) &lt;- NULL WV_data &lt;- WV_data[-1,]...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 32 West Virginia | A Minimal Book Example">
+<meta name="twitter:description" content="WV_data &lt;- as.data.frame(res_westvirginia_4[,1]/res_westvirginia_4[,2]) colnames(WV_data)[1] &lt;- “GD_GL” WV_data$Sources &lt;- rownames(WV_data) rownames(WV_data) &lt;- NULL WV_data &lt;- WV_data[-1,]...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.4.2/transition.js"></script><script src="libs/bs3compat-0.4.2/tabs.js"></script><script src="libs/bs3compat-0.4.2/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<style type="text/css">
+    /* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+        }
+    .hanging div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }
+  </style>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">A Minimal Book Example</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html"><span class="header-section-number">1</span> About</a></li>
+<li><a class="" href="start-analysis-here.html"><span class="header-section-number">2</span> Start analysis here —————————————————–</a></li>
+<li><a class="" href="vcf-file-location-mydatadatasharespruceexome_capturewes_mappingannotationsref_pglaucavcf_split_files.html"><span class="header-section-number">3</span> VCF file location: ~/mydata/datashare/Spruce/exome_capture/WES_mapping/Annotations/ref_Pglauca/VCF_split_files</a></li>
+<li><a class="" href="vcf-file.html"><span class="header-section-number">4</span> VCF file</a></li>
+<li><a class="" href="list---list.filespath-zanoobtnc-pattern-test_genetic_load.vcf-recursivetrue-full.names-t.html"><span class="header-section-number">5</span> list &lt;- list.files(path = “Z:/Anoob/TNC”, pattern = “test_genetic_load.vcf”, recursive=TRUE, full.names = T)</a></li>
+<li><a class="" href="list---list.filespath-.-pattern-red_spruce_snpeff_-recursivetrue-full.names-t.html"><span class="header-section-number">6</span> list &lt;- list.files(path = “./”, pattern = “Red_Spruce_snpeff_”, recursive=TRUE, full.names = T)</a></li>
+<li><a class="" href="section-2.html"><span class="header-section-number">7</span></a></li>
+<li><a class="" href="genes---lapplylist1-functionx-read.tablex-nrow-100000-originally-run-for-testing.html"><span class="header-section-number">8</span> genes &lt;- lapply(list[1], function(x) read.table(x, nrow = 100000)) # originally run for testing</a></li>
+<li><a class="" href="info-samples.html"><span class="header-section-number">9</span> Info samples</a></li>
+<li><a class="" href="read-depth.html"><span class="header-section-number">10</span> Read depth</a></li>
+<li><a class="" href="depth---applytab-c19-2-functionx-as.integerunlistlapplystrsplitas.characterx-split-functiony-y1.html"><span class="header-section-number">11</span> depth &lt;- apply(TAB[,-c(1:9)], 2, function(x) as.integer(unlist(lapply(strsplit(as.character(x), split = “:”), function(y) y[1]))))</a></li>
+<li><a class="" href="genotype-probabilities-changed-by-na-for-the-uncovered-sites.html"><span class="header-section-number">12</span> Genotype probabilities, changed by NA for the uncovered sites</a></li>
+<li><a class="" href="gen_prob---applytab-c19-2-functionx-unlistlapplystrsplitas.characterx-split-functiony-y3.html"><span class="header-section-number">13</span> gen_prob &lt;- apply(TAB[,-c(1:9)], 2, function(x) unlist(lapply(strsplit(as.character(x), split = “:”), function(y) y[3])))</a></li>
+<li><a class="" href="proba-alternative-allele.html"><span class="header-section-number">14</span> Proba alternative allele</a></li>
+<li><a class="" href="frequency-of-the-alternative-allele-for-each-locus-and-population.html"><span class="header-section-number">15</span> Frequency of the alternative allele for each locus and population</a></li>
+<li><a class="" href="three-groups-of-source-populations-for-the-three-planting-sites-removing-xvc-and-hr-because-of-their-northern-ancestry.html"><span class="header-section-number">16</span> Three groups of source populations for the three planting sites, removing XVC and HR because of their northern ancestry</a></li>
+<li><a class="" href="function-to-estimate-allelic-richness-after-rarefaction.html"><span class="header-section-number">17</span> function to estimate allelic richness after rarefaction</a></li>
+<li><a class="" href="function-to-estimate-the-ratio-of-nonsynonymoussynonymous-mutation.html"><span class="header-section-number">18</span> function to estimate the ratio of nonsynonymous/synonymous mutation</a></li>
+<li><a class="" href="genetic-diversity-and-load-with-only-a-subset-of-p-populations.html"><span class="header-section-number">19</span> Genetic diversity and load with only a subset of P populations</a></li>
+<li><a class="" href="sum-or-length.html"><span class="header-section-number">20</span> sum() or length()</a></li>
+<li><a class="" href="working-genetic-load-3.html"><span class="header-section-number">21</span> working genetic load 3</a></li>
+<li><a class="" href="function-to-estimate-hexp-allelic-richness-and-genetic-load-in-all-combination-of-p-populations.html"><span class="header-section-number">22</span> function to estimate Hexp, Allelic Richness and Genetic Load in all combination of P populations</a></li>
+<li><a class="" href="optimization-sources-for-site-in-maryland.html"><span class="header-section-number">23</span> Optimization sources for site in Maryland</a></li>
+<li><a class="" href="optimization-sources-for-site-in-west-virginia.html"><span class="header-section-number">24</span> Optimization sources for site in West Virginia</a></li>
+<li><a class="" href="optimization-sources-for-site-in-virginia.html"><span class="header-section-number">25</span> Optimization sources for site in Virginia</a></li>
+<li><a class="" href="pop-comb.html"><span class="header-section-number">26</span> 4 pop comb</a></li>
+<li><a class="" href="plots.html"><span class="header-section-number">27</span> plots</a></li>
+<li><a class="" href="remove-xcv-combs.html"><span class="header-section-number">28</span> remove XCV combs</a></li>
+<li><a class="" href="plotting-end.html"><span class="header-section-number">29</span> plotting end</a></li>
+<li><a class="" href="plots-for-apps--.html"><span class="header-section-number">30</span> Plots for APPS ———————————————————-</a></li>
+<li><a class="" href="maryland-final.html"><span class="header-section-number">31</span> Maryland final</a></li>
+<li><a class="active" href="west-virginia.html"><span class="header-section-number">32</span> West Virginia</a></li>
+<li><a class="" href="va-test.html"><span class="header-section-number">33</span> VA test</a></li>
+<li><a class="" href="virginia.html"><span class="header-section-number">34</span> Virginia</a></li>
+<li><a class="" href="save-data-for-further-analysis.html"><span class="header-section-number">35</span> save data for further analysis</a></li>
+<li><a class="" href="saverdsgdgl_list-.outputgenetic_diversity_and_genetic_loadgdgl_list.html"><span class="header-section-number">36</span> saveRDS(GDGL_list, “./OUTPUT/Genetic_diversity_and_Genetic_load/GDGL_list”)</a></li>
+<li><a class="" href="convert-to-long-data.html"><span class="header-section-number">37</span> convert to long data</a></li>
+<li><a class="" href="final-figure.html"><span class="header-section-number">38</span> final figure</a></li>
+<li><a class="" href="figure-dim-png2000h769w-pdf7h18w.html"><span class="header-section-number">39</span> figure dim: png(2000h,769w), pdf(7h,18w)</a></li>
+<li><a class="" href="write.csvmarylandsources.outputmarylandsources_selected_top50.csv.html"><span class="header-section-number">40</span> write.csv(MarylandSources,“./OUTPUT/MarylandSources_selected_top50.csv”)</a></li>
+<li><a class="" href="write.csvvirginiasources.outputvirginiasources_selected_top50.csv.html"><span class="header-section-number">41</span> write.csv(VirginiaSources,“./OUTPUT/VirginiaSources_selected_top50.csv”)</a></li>
+<li><a class="" href="write.csvwestvirginiasources.outputwestvirginiasources_selected_top50.csv.html"><span class="header-section-number">42</span> write.csv(WestVirginiaSources,“./OUTPUT/WestVirginiaSources_selected_top50.csv”)</a></li>
+<li><a class="" href="estimate-genetic-load-and-genetic-diversity-of-each-pops--.html"><span class="header-section-number">43</span> Estimate genetic load and genetic diversity of each pops —————-</a></li>
+<li><a class="" href="optimization-sources-for-site-in-maryland-1.html"><span class="header-section-number">44</span> Optimization sources for site in Maryland</a></li>
+<li><a class="" href="write.csvres_maryland_singular-.outputgenetic_diversity_and_genetic_loadmaryland_gdgl_per_source.html"><span class="header-section-number">45</span> write.csv(res_maryland_singular, “./OUTPUT/Genetic_diversity_and_Genetic_load/maryland_GDGL_per_source”)</a></li>
+<li><a class="" href="optimization-sources-for-site-in-west-virginia-1.html"><span class="header-section-number">46</span> Optimization sources for site in West Virginia</a></li>
+<li><a class="" href="write.csvres_westvirginia_singular-.outputgenetic_diversity_and_genetic_loadwest_virginia_gdgl_per_source.html"><span class="header-section-number">47</span> write.csv(res_westvirginia_singular, “./OUTPUT/Genetic_diversity_and_Genetic_load/west_virginia_GDGL_per_source”)</a></li>
+<li><a class="" href="optimization-sources-for-site-in-virginia-1.html"><span class="header-section-number">48</span> Optimization sources for site in Virginia</a></li>
+<li><a class="" href="write.csvres_virginia_singular-.outputgenetic_diversity_and_genetic_loadvirginia_gdgl_per_source.html"><span class="header-section-number">49</span> write.csv(res_virginia_singular, “./OUTPUT/Genetic_diversity_and_Genetic_load/virginia_GDGL_per_source”)</a></li>
+<li><a class="" href="full-sets-of-pops.html"><span class="header-section-number">50</span> full sets of pops</a></li>
+<li><a class="" href="hello-bookdown.html"><span class="header-section-number">51</span> Hello bookdown</a></li>
+<li><a class="" href="cross.html"><span class="header-section-number">52</span> Cross-references</a></li>
+<li><a class="" href="parts.html"><span class="header-section-number">53</span> Parts</a></li>
+<li><a class="" href="footnotes-and-citations.html"><span class="header-section-number">54</span> Footnotes and citations</a></li>
+<li><a class="" href="blocks.html"><span class="header-section-number">55</span> Blocks</a></li>
+<li><a class="" href="sharing-your-book.html"><span class="header-section-number">56</span> Sharing your book</a></li>
+<li><a class="" href="references.html">References</a></li>
+</ul>
+
+        <div class="book-extra">
+          
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="west-virginia" class="section level1" number="32">
+<h1>
+<span class="header-section-number">32</span> West Virginia<a class="anchor" aria-label="anchor" href="#west-virginia"><i class="fas fa-link"></i></a>
+</h1>
+<p>WV_data &lt;- as.data.frame(res_westvirginia_4[,1]/res_westvirginia_4[,2])
+colnames(WV_data)[1] &lt;- “GD_GL”
+WV_data$Sources &lt;- rownames(WV_data)
+rownames(WV_data) &lt;- NULL
+WV_data &lt;- WV_data[-1,]</p>
+<p>WV_plot &lt;- ggplot(WV_data, aes(x=GD_GL)) +
+geom_histogram(aes(y=..density..),color=“#FF7F50”,fill=“white”, position=“dodge”, bins=60)+
+geom_density(alpha=.2, fill=“#FF7F50”, color=“#FFBF00”) +
+geom_vline(aes(xintercept=res_westvirginia_4[“XCS_XDS_XPK_XSK”,1]/res_westvirginia_4[“XCS_XDS_XPK_XSK”,2]),
+linetype=“dashed”, color=“#7B241C”)+
+theme(legend.position=“top”)</p>
+<p>plot2 &lt;- WV_plot + scale_color_brewer(palette=“Dark2”) +
+theme_minimal()+theme_classic()+theme(legend.position=“top”) +
+ylab(“Frequency”) + xlab(“Genetic Diversity/Genetic Load”) +
+theme_bw(base_size = 11, base_family = “Times”) +
+theme(axis.text=element_text(size=14),
+axis.title=element_text(size=18),
+panel.background = element_blank(),
+legend.background = element_blank(),
+panel.grid = element_blank(),
+plot.background = element_blank(),
+legend.text=element_text(size=rel(.8)),
+strip.text = element_text(size=30),
+legend.position = “none”)</p>
+</div>
+  <div class="chapter-nav">
+<div class="prev"><a href="maryland-final.html"><span class="header-section-number">31</span> Maryland final</a></div>
+<div class="next"><a href="va-test.html"><span class="header-section-number">33</span> VA test</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav"><li><a class="nav-link" href="#west-virginia"><span class="header-section-number">32</span> West Virginia</a></li></ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+          
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>A Minimal Book Example</strong>" was written by John Doe. It was last built on 2023-11-20.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>

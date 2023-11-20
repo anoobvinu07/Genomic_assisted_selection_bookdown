@@ -3,7 +3,7 @@
     "path": "Z:/Anoob/GitHub/Genomic_assisted_selection/_output.yml",
     "project_path": "_output.yml",
     "type": "yaml",
-    "hash": "0",
+    "hash": "326269592",
     "contents": "",
     "dirty": false,
     "created": 1700453345130.0,
@@ -11,14 +11,16 @@
     "relative_order": 4,
     "properties": {
         "source_window_id": "",
-        "Source": "Source"
+        "Source": "Source",
+        "cursorPosition": "3,22",
+        "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1700453318,
+    "lastKnownWriteTime": 1700498481,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1700453318,
+    "last_content_update": 1700498482041,
     "read_only": false,
     "read_only_alternatives": []
 }
