@@ -5,7 +5,7 @@ language:
     chapter_name: "Chapter "
 rmd_files: [
   "index.Rmd",
-  "01-intro.Rmd",
+  
   "1.1-setting_up_gd-gl_workflow.Rmd",
   "1.2-function_to_estimate_gd-gl.Rmd",
   "1.3-find_source_combos_gd-gl.Rmd",

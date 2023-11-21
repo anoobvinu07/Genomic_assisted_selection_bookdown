@@ -44,7 +44,6 @@
       <nav aria-label="Table of contents"><h2>Table of contents</h2>
         <ul class="book-toc list-unstyled">
 <li><a class="" href="index.html">About</a></li>
-<li><a class="" href="hello-bookdown.html"><span class="header-section-number">1</span> Hello bookdown</a></li>
 <li class="book-part">Genomic selection of sources</li>
 <li><a class="active" href="setting-up.html">Setting up</a></li>
 <li><a class="" href="funtions-to-optimize-selection.html">Funtions to optimize selection</a></li>
@@ -64,7 +63,7 @@
 <div id="import-annotations-from-snpeff" class="section level2 unnumbered">
 <h2>Import annotations from SnpEff<a class="anchor" aria-label="anchor" href="#import-annotations-from-snpeff"><i class="fas fa-link"></i></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## working directory </span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html">setwd</a></span><span class="op">(</span><span class="st">"~/mydata/Anoob/TNC"</span><span class="op">)</span></span>
 <span></span>
@@ -78,7 +77,7 @@
 <span><span class="va">TAB</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">TAB</span><span class="op">)</span></span>
 <span><span class="va">category</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html">do.call</a></span><span class="op">(</span><span class="va">c</span>, <span class="va">category</span><span class="op">)</span></span></code></pre></div>
 <p>Read in the meta data for the samples.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Info samples</span></span>
 <span><span class="va">names</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strsplit.html">strsplit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strsplit.html">strsplit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span><span class="op">(</span><span class="st">"all_bam.list"</span><span class="op">)</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span>, split <span class="op">=</span> <span class="st">"_rmdup.sorted.bam"</span><span class="op">)</span><span class="op">)</span>, split <span class="op">=</span> <span class="st">"./"</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">pops</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strsplit.html">strsplit</a></span><span class="op">(</span><span class="va">names</span>, split<span class="op">=</span><span class="st">"_"</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
@@ -90,7 +89,7 @@
 <div id="allele-probabilities-and-frequencies" class="section level2 unnumbered">
 <h2>Allele probabilities and frequencies<a class="anchor" aria-label="anchor" href="#allele-probabilities-and-frequencies"><i class="fas fa-link"></i></a>
 </h2>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Read depth </span></span>
 <span><span class="va">depth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span><span class="op">(</span><span class="va">TAB</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">9</span><span class="op">)</span><span class="op">]</span>, <span class="fl">2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strsplit.html">strsplit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, split <span class="op">=</span> <span class="st">":"</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="va">y</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -109,7 +108,7 @@
 </div>
 </div>
   <div class="chapter-nav">
-<div class="prev"><a href="hello-bookdown.html"><span class="header-section-number">1</span> Hello bookdown</a></div>
+<div class="prev"><a href="index.html">About</a></div>
 <div class="next"><a href="funtions-to-optimize-selection.html">Funtions to optimize selection</a></div>
 </div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
@@ -134,7 +133,7 @@
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Bringing genomics to the field: an integrative approach to forest restoration</strong>" was written by Anoob Prakash. It was last built on 2023-11-20.</p>
+    <p>"<strong>Bringing genomics to the field: an integrative approach to forest restoration</strong>" was written by Anoob Prakash. It was last built on 2023-11-21.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
@@ -142,34 +141,6 @@
   </div>
 
 </div></div>
-</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
-  (function () {
-    var script = document.createElement("script");
-    script.type = "text/javascript";
-    var src = "true";
-    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:")
-      if (/^https?:/.test(src))
-        src = src.replace(/^https?:/, '');
-    script.src = src;
-    document.getElementsByTagName("head")[0].appendChild(script);
-  })();
-</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
-for (let popover of popovers) {
-  const div = document.createElement('div');
-  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
-  div.innerHTML = popover.getAttribute('data-content');
-
-  var has_math = div.querySelector("span.math");
-  if (has_math) {
-    document.body.appendChild(div);
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
-    MathJax.Hub.Queue(function() {
-      popover.setAttribute('data-content', div.innerHTML);
-      document.body.removeChild(div);
-    })
-  }
-}
-</script>
+</footer>
 </body>
 </html>

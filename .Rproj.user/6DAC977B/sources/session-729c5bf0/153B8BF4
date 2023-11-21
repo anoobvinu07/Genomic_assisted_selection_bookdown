@@ -3,7 +3,7 @@
     "path": "Z:/Anoob/GitHub/Genomic_assisted_selection/style.css",
     "project_path": "style.css",
     "type": "css",
-    "hash": "0",
+    "hash": "1641872271",
     "contents": "",
     "dirty": false,
     "created": 1700514194920.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "2,15",
+        "cursorPosition": "20,1",
         "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1700453315,
+    "lastKnownWriteTime": 1700541952,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1700453315,
+    "last_content_update": 1700541952909,
     "read_only": false,
     "read_only_alternatives": []
 }

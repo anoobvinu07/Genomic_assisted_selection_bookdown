@@ -12,3 +12,10 @@ pre {
 pre code {
   white-space: inherit;
 }
+
+.container-fluid {
+    max-width: 120rem;
+}
+.container-fluid main {
+    max-width: 55rem;
+}

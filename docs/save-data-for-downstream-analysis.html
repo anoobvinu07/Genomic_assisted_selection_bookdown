@@ -44,7 +44,6 @@
       <nav aria-label="Table of contents"><h2>Table of contents</h2>
         <ul class="book-toc list-unstyled">
 <li><a class="" href="index.html">About</a></li>
-<li><a class="" href="hello-bookdown.html"><span class="header-section-number">1</span> Hello bookdown</a></li>
 <li class="book-part">Genomic selection of sources</li>
 <li><a class="" href="setting-up.html">Setting up</a></li>
 <li><a class="" href="funtions-to-optimize-selection.html">Funtions to optimize selection</a></li>
@@ -63,7 +62,7 @@
 <div id="creating-the-gdgl-list" class="section level2 unnumbered">
 <h2>Creating the GD/GL list<a class="anchor" aria-label="anchor" href="#creating-the-gdgl-list"><i class="fas fa-link"></i></a>
 </h2>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># save data for further analysis</span></span>
 <span><span class="va">MD_reg_GDGL</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="va">res_maryland</span><span class="op">)</span></span>
 <span><span class="va">MD_reg_GDGL</span><span class="op">$</span><span class="va">GDGL</span> <span class="op">&lt;-</span> <span class="va">MD_reg_GDGL</span><span class="op">$</span><span class="va">Hexp</span><span class="op">/</span><span class="va">MD_reg_GDGL</span><span class="op">$</span><span class="va">GenLoad</span></span>
@@ -86,7 +85,7 @@
 <div id="for-source-selection-maps" class="section level2 unnumbered">
 <h2>For source selection maps<a class="anchor" aria-label="anchor" href="#for-source-selection-maps"><i class="fas fa-link"></i></a>
 </h2>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">MarylandSources</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="va">res_maryland</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span><span class="op">/</span><span class="va">res_maryland</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span>,<span class="fl">50</span><span class="op">)</span></span>
 <span><span class="va">MarylandSources</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="va">MarylandSources</span><span class="op">)</span></span>
 <span><span class="va">MarylandSources</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="va">MarylandSources</span><span class="op">)</span></span>
@@ -116,7 +115,7 @@
 <div id="estimate-genetic-load-and-genetic-diversity-of-each-pops" class="section level2 unnumbered">
 <h2>Estimate genetic load and genetic diversity of each pops<a class="anchor" aria-label="anchor" href="#estimate-genetic-load-and-genetic-diversity-of-each-pops"><i class="fas fa-link"></i></a>
 </h2>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Optimization sources for site in Maryland</span></span>
 <span><span class="va">res_maryland_singular</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/optimize.html">optimize</a></span><span class="op">(</span><span class="va">TAB_pop_maryland</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html">which.max</a></span><span class="op">(</span><span class="va">res_maryland_singular</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span><span class="op">/</span><span class="va">res_maryland_singular</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
@@ -174,7 +173,7 @@
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Bringing genomics to the field: an integrative approach to forest restoration</strong>" was written by Anoob Prakash. It was last built on 2023-11-20.</p>
+    <p>"<strong>Bringing genomics to the field: an integrative approach to forest restoration</strong>" was written by Anoob Prakash. It was last built on 2023-11-21.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
@@ -182,34 +181,6 @@
   </div>
 
 </div></div>
-</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
-  (function () {
-    var script = document.createElement("script");
-    script.type = "text/javascript";
-    var src = "true";
-    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:")
-      if (/^https?:/.test(src))
-        src = src.replace(/^https?:/, '');
-    script.src = src;
-    document.getElementsByTagName("head")[0].appendChild(script);
-  })();
-</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
-for (let popover of popovers) {
-  const div = document.createElement('div');
-  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
-  div.innerHTML = popover.getAttribute('data-content');
-
-  var has_math = div.querySelector("span.math");
-  if (has_math) {
-    document.body.appendChild(div);
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
-    MathJax.Hub.Queue(function() {
-      popover.setAttribute('data-content', div.innerHTML);
-      document.body.removeChild(div);
-    })
-  }
-}
-</script>
+</footer>
 </body>
 </html>

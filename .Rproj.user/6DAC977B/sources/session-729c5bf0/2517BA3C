@@ -3,7 +3,7 @@
     "path": "Z:/Anoob/GitHub/Genomic_assisted_selection/index.Rmd",
     "project_path": "index.Rmd",
     "type": "r_markdown",
-    "hash": "0",
+    "hash": "1312370736",
     "contents": "",
     "dirty": false,
     "created": 1700453339649.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "1,85",
-        "scrollLine": "0"
+        "cursorPosition": "30,0",
+        "scrollLine": "12"
     },
     "folds": "",
-    "lastKnownWriteTime": 1700510817,
+    "lastKnownWriteTime": 1700543889,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1700510819187,
+    "last_content_update": 1700543891545,
     "read_only": false,
     "read_only_alternatives": []
 }

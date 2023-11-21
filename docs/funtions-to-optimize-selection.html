@@ -44,7 +44,6 @@
       <nav aria-label="Table of contents"><h2>Table of contents</h2>
         <ul class="book-toc list-unstyled">
 <li><a class="" href="index.html">About</a></li>
-<li><a class="" href="hello-bookdown.html"><span class="header-section-number">1</span> Hello bookdown</a></li>
 <li class="book-part">Genomic selection of sources</li>
 <li><a class="" href="setting-up.html">Setting up</a></li>
 <li><a class="active" href="funtions-to-optimize-selection.html">Funtions to optimize selection</a></li>
@@ -64,7 +63,7 @@
 <h2>Select regions to select sources<a class="anchor" aria-label="anchor" href="#select-regions-to-select-sources"><i class="fas fa-link"></i></a>
 </h2>
 <p>Based on the idea of <strong><em>Regional admixture provenancing</em></strong> (citation), seed sources were selected regionally for each restoration site. Three groups of source populations were subsetted for the three planting sites, removing XVC and HR because of their northern ancestry. More info on the regional ancestry detailed in (citation).</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Sources considered for the Maryland restoration site </span></span>
 <span><span class="va">TAB_pop_maryland</span> <span class="op">&lt;-</span> <span class="va">TAB_pop</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">TAB_pop</span><span class="op">)</span><span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span><span class="va">info_pops</span><span class="op">$</span><span class="va">Site</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">info_pops</span><span class="op">$</span><span class="va">Region</span><span class="op">==</span><span class="st">"E"</span> <span class="op">&amp;</span> <span class="op">!</span><span class="va">info_pops</span><span class="op">$</span><span class="va">State</span><span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"NC"</span>,<span class="st">"TN"</span><span class="op">)</span> <span class="op">&amp;</span> <span class="op">!</span><span class="va">info_pops</span><span class="op">$</span><span class="va">Site</span><span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"XCV"</span>,<span class="st">"HR"</span><span class="op">)</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">]</span></span>
 <span></span>
@@ -77,7 +76,7 @@
 <div id="optimizing-genetic-diversity" class="section level2 unnumbered">
 <h2>Optimizing genetic diversity<a class="anchor" aria-label="anchor" href="#optimizing-genetic-diversity"><i class="fas fa-link"></i></a>
 </h2>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># function to estimate allelic richness after rarefaction</span></span>
 <span><span class="va">rarefy_AR</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">g</span>, <span class="va">bootstraping</span><span class="op">=</span><span class="fl">100</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="va">Nijg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -101,7 +100,7 @@
 <h2>Estimate the genetic load<a class="anchor" aria-label="anchor" href="#estimate-the-genetic-load"><i class="fas fa-link"></i></a>
 </h2>
 <p>The following function is used to estiamte the ratio of nonsynonymous/synonymous mutation based on the annotation from <a href="https://pcingola.github.io/SnpEff/">SnpEff v5.1</a> <em>(Cingolani et al., 2012)</em>, which was used to annotate genetic variants to functional class based on Norway spruce genome annotation. The functional categories <em>viz.</em> <code>missense variant, splice acceptor variant, splice donor variant, splice region variant, start lost, stop gained, stop lost</code> were used to designate as non-synonymous mutation in our calculation for genetic load.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">genetic_load</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">category</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="va">nonsyn_sites</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">category</span><span class="op">==</span><span class="st">"missense_variant"</span> <span class="op">|</span> <span class="va">category</span><span class="op">==</span><span class="st">"splice_acceptor_variant"</span> <span class="op">|</span> <span class="va">category</span><span class="op">==</span><span class="st">"splice_donor_variant"</span> <span class="op">|</span> <span class="va">category</span><span class="op">==</span><span class="st">"splice_region_variant"</span> <span class="op">|</span> <span class="va">category</span><span class="op">==</span><span class="st">"start_lost"</span> <span class="op">|</span> <span class="va">category</span><span class="op">==</span><span class="st">"stop_gained"</span> <span class="op">|</span> <span class="va">category</span><span class="op">==</span><span class="st">"stop_lost"</span><span class="op">)</span></span>
 <span>  <span class="va">freq_nonsyn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">data</span><span class="op">[</span><span class="va">nonsyn_sites</span><span class="op">]</span>, na.rm <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
@@ -114,7 +113,7 @@
 <h2>Combined function to optimize source combinations<a class="anchor" aria-label="anchor" href="#combined-function-to-optimize-source-combinations"><i class="fas fa-link"></i></a>
 </h2>
 <p>This function combines the rarefy_AR and genetic_load function to estimate expected heterozygosity (Hexp), allelic richness and genetic load in all combinations of <strong><em>P</em></strong> populations. The <strong><em>P</em></strong> depends on the number of sources one decides to select for their restoration site.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># function to estimate Hexp, Allelic Richness and Genetic Load in all combination of P populations</span></span>
 <span><span class="va">optimize</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">P</span><span class="op">)</span><span class="op">{</span></span>
 <span>  </span>
@@ -149,7 +148,7 @@
 <div id="apply-the-function-to-get-optimal-source-combinations" class="section level2 unnumbered">
 <h2>Apply the function to get optimal source combinations<a class="anchor" aria-label="anchor" href="#apply-the-function-to-get-optimal-source-combinations"><i class="fas fa-link"></i></a>
 </h2>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Optimization sources for site in Maryland</span></span>
 <span><span class="va">res_maryland</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/optimize.html">optimize</a></span><span class="op">(</span><span class="va">TAB_pop_maryland</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html">which.max</a></span><span class="op">(</span><span class="va">res_maryland</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span><span class="op">/</span><span class="va">res_maryland</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
@@ -194,7 +193,7 @@
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Bringing genomics to the field: an integrative approach to forest restoration</strong>" was written by Anoob Prakash. It was last built on 2023-11-20.</p>
+    <p>"<strong>Bringing genomics to the field: an integrative approach to forest restoration</strong>" was written by Anoob Prakash. It was last built on 2023-11-21.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
@@ -202,34 +201,6 @@
   </div>
 
 </div></div>
-</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
-  (function () {
-    var script = document.createElement("script");
-    script.type = "text/javascript";
-    var src = "true";
-    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:")
-      if (/^https?:/.test(src))
-        src = src.replace(/^https?:/, '');
-    script.src = src;
-    document.getElementsByTagName("head")[0].appendChild(script);
-  })();
-</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
-for (let popover of popovers) {
-  const div = document.createElement('div');
-  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
-  div.innerHTML = popover.getAttribute('data-content');
-
-  var has_math = div.querySelector("span.math");
-  if (has_math) {
-    document.body.appendChild(div);
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
-    MathJax.Hub.Queue(function() {
-      popover.setAttribute('data-content', div.innerHTML);
-      document.body.removeChild(div);
-    })
-  }
-}
-</script>
+</footer>
 </body>
 </html>
