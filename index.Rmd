@@ -20,7 +20,7 @@ suppress-bibliography: false
 
 ::: {.rmdimportant}
 **Bringing genomics to the field: An integrative approach to forest restoration**  
-*Anoob Prakash, Thibaut Capblancq, Kathryn Shallows, Deborah Landau, Chad Landress, and Stephen Keller*  
+*Anoob Prakash, Thibaut Capblancq, Kathryn Shallows, Dave Seville, Deborah Landau, Chad Landress, Tal Jacobs and Stephen Keller*  
 
 :::
 
